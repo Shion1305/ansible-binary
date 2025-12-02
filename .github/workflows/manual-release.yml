@@ -21,10 +21,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             arch: amd64
             artifact_name: ansible-linux-amd64
-          - os: ubuntu-22.04-arm64
+          - os: ubuntu-24.04-arm
             arch: arm64
             artifact_name: ansible-linux-arm64
 
