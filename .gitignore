@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.python-version
+
+# Nuitka build artifacts
+*.build/
+*.dist/
+*.onefile-build/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# pnpm
+node_modules/
+
+# Binary output
+ansible
+ansible-playbook
+ansible-galaxy
+ansible-*-binary
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

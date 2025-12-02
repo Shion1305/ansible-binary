@@ -1,0 +1,11 @@
+[project]
+name = "ansible-binary"
+version = "1.0.0"
+description = "Standalone Ansible binary built with Nuitka"
+requires-python = ">=3.10"
+dependencies = [
+    "ansible==9.11.0",
+    "nuitka>=2.4,<3.0",
+    "ordered-set>=4.1.0",
+    "zstandard>=0.23.0",
+]
