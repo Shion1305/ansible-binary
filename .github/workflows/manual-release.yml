@@ -1,0 +1,82 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.1.0)"
+        required: true
+      prerelease:
+        description: "Mark this release as a prerelease"
+        required: false
+        default: "false"
+
+jobs:
+  build:
+    name: Build Linux ${{ matrix.arch }} binary
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+            artifact_name: ansible-linux-amd64
+          - os: ubuntu-22.04-arm64
+            arch: arm64
+            artifact_name: ansible-linux-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
+        with:
+          aqua_version: v2.43.1
+
+      - name: Install tools via aqua (uv)
+        run: aqua i
+
+      - name: Show uv version
+        run: uv --version
+
+      - name: Build ansible binary with uv + Nuitka
+        run: |
+          uv run python build.py
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p upload
+          cp dist/ansible "upload/${{ matrix.artifact_name }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: upload/*
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: ls -R artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          files: |
+            artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
